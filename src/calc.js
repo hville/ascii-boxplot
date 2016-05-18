@@ -1,135 +1,127 @@
 /*eslint no-console: 0*/
-var assign = require('object-assign')
+//var assign = require('object-assign')
+
+/**
+ * MODEL
+ * a% == a/2*PI*N = f(r% == r/R)
+ *
+ * INPUT
+ * N: number of turns
+ * R: length of Radius
+ * A: Angle of Radius
+ * F: Sampling Frequency (nominal qty/turn)
+ * b: tangent point (%R)
+ *
+ * CALCULATED
+ * r = %R
+ * a = %(2*PI*N)
+ *
+ * CURVE TYPES (a0=0, a1=1)
+ * QUAD: a=2r-r^b; da/dr=2-br^(b-1); da0=2; da1=2-b; lin@ b=1, tan@b=2; max@ br^(b-1)=2
+ *
+ * EXP: a=r*exp(b(1-r)); da/dr=(1-br)*exp(b(1-r)); da0=exp(b); da1=(1-b); lin@ b=0; tan@ b=1 max@ r=1/b
+ *
+ * LOG: a=ln(br+1)/ln(b+1) da/dr= b / ((br+1)*ln(b+1))
+ *
+ * HYP: a = (z+1)r/(zr^b+1) da/dr= (z+1)/(zr^b+1) * (1 - b(zr^b)/(zr^b+1))
+ */
+function xy(center, radius, direction) { // actual position direction at stem
+	return [center[0] + radius * Math.cos(direction), center[1] + radius * Math.sin(direction)]
+}
+
+function a(r, b) { // angle starting from 0 at leaf center
+	//return r * Math.exp(b*(1-r))
+	//console.log(1 - Math.pow(1-r, b), r, b)
+	//return 1 - Math.pow(1-r, b)
+	var aa=0.4
+	return 1 - Math.pow(1-Math.pow(r,aa), b)
+	//return Math.log(b*r +1) / Math.log(b +1)
+	//return 5*r - 4*Math.pow(r,b)
+	//var aa = 3
+	//return (aa+1)*r - aa * Math.pow(r, b/aa + 1)
+	//return Math.pow(r, 1/b)
+}
+
+function dadr(r, b) {
+	//return (1-b*r) * Math.exp(b*(1-r))
+	//return 1 + b*Math.pow(1-r, b-1)
+	var aa=0.4
+	return b*Math.pow(1-Math.pow(r,aa), b-1) * (-aa)*Math.pow(r,aa-1)
+	//return b / ( (b*r+1)*Math.log(b*r +1) )
+	//return 5 - 4*b*Math.pow(r,b-1)
+	//var aa = 3
+	//return (aa+1)*r - (aa+b) * Math.pow(r, b/aa)
+	//return Math.pow(r, 1/b-1) / b
+}
+
+// TO GET AN APPROXIMATE CONSTANT ANGLE SAMPLING
+function Δr(N, F, r, b) {
+	return 1/(N*F * Math.sqrt( Math.pow(r*dadr(r, b), 2) + 1))
+}
+
+function curve(stemXY, radius, width, direction, turns, escape, frequency) {
+	return {
+		R: radius,
+		W: width,
+		A: direction - Math.PI - 2*Math.PI*turns,
+		N: turns,
+		b: escape,
+		F: frequency,
+		P0: stemXY,
+		PN: xy(stemXY, radius, direction),
+		r: 1, //current %R from leaf
+		a: 1, //current angle from leaf
+		xys: [stemXY],
+		pts: []
+	}
+}
 
 function step(itm) {
-	if (itm.tv <= 0) return itm
-	var dt = 1 / itm.N,
-			dx = itm.tv * Math.cos(itm.pa) * dt,
-			dy = itm.tv * Math.sin(itm.pa) * dt,
-			dv = itm.ta * dt
+	var displayRadius = itm.r * itm.R,
+			displayAngle = itm.A + itm.a * 2*Math.PI*itm.N
 
-	var dθ = itm.tv ? Math.atan(itm.ca * dt / itm.tv)
-		: itm.ca > 0 ? Math.PI/2
-		: - Math.PI/2
+	itm.pts.push(xy(itm.PN, displayRadius, displayAngle+itm.W/itm.R))
 
-	itm.t += dt
-	itm.px += dx
-	itm.py += dy
-	itm.pa += dθ
-	itm.ca += itm.cc * dt
-	itm.tv += dv
-
-	console.log('0:',
-		'dr/dt', (Math.sqrt(dx*dx + dy*dy)/dt).toPrecision(3),
-		'dθ/dt', (dθ/dt).toPrecision(3),
-		'dv/dt', (dv/dt).toPrecision(3)
-	)
+	while (itm.r > 0) {
+		var dr = Δr(itm.N, itm.F, itm.r, itm.b)
+		if (dr > itm.r) {
+			itm.r = 0
+			itm.xys.push(itm.PN)
+			itm.pts.push(itm.PN)
+		} else {
+			itm.r -= dr
+			itm.a = a(itm.r, itm.b)
+			displayRadius = itm.r * itm.R
+			displayAngle = itm.A + itm.a * 2*Math.PI*itm.N
+			itm.xys.push(xy(itm.PN, displayRadius, displayAngle))
+			itm.pts.push(xy(itm.PN, displayRadius, displayAngle+itm.W/itm.R))
+		}
+	}
+	for (var i=itm.xys.length; i--;) {
+		itm.pts.push([
+			2*itm.xys[i][0]-itm.pts[i][0],
+			2*itm.xys[i][1]-itm.pts[i][1]
+		])
+	}
+	itm.xys = itm.pts
 
 	return itm
 }
 
-function step2(itm) {
-	if (itm.tv <= 0) return itm
-	//itm.cω = itm.ca / itms.tv // 1/T
-	//itm.dt = opt.fdraw * opt.fcalc / itm.cω
-	//++itm.n
-	//var ω = itm.tv ? Math.tan(	itm.ca / itm.tv) : Math.PI/2 //Math.atan(itm.ca / itm.tv)
-	//var dt = ω ? Math.abs(2 * Math.PI / ω / opt.fdraw / opt.fcalc) : (1-itm.t)/(itm.N-itm.n)
-
-	var dt = 1 / itm.N,
-			dx = itm.tv * Math.cos(itm.θ) * dt,
-			dy = itm.tv * Math.sin(itm.θ) * dt,
-			dv = itm.ta * dt,
-			dθ = itm.ω * dt,
-			dω = itm.α * dt
-
-	itm.t += dt
-	itm.px += dx
-	itm.py += dy
-	itm.tv += dv
-	itm.θ += dθ
-	itm.ω += dω
-
-	console.log('1:',
-		'dr/dt', (Math.sqrt(dx*dx + dy*dy)/dt).toPrecision(3),
-		'dθ/dt', (dθ/dt).toPrecision(3),
-		'dv/dt', (dv/dt).toPrecision(3),
-		'dω/dt', (dω/dt).toPrecision(3),
-		'dθ', dθ.toPrecision(3)
-	)
-
-	return itm
-}
-
-module.exports = function(items, options) {
-	// a pair of lines with each tip an attractor to the other
-	var itm = {
-		N: 40,
-		// POSITION
-		px: +0, // %R
-		py: +0,	// %R
-		pa: +0, // rad
-		// VELOCITY
-		tv: +2, // R/T
-		// SWIRL
-		ca: -7, // R/T**2
-		cc: +40, // R/T**3
-		// Branching
-		nb: 1, // branching / T
-		// CALCULATED / OTHER
-		ta: 0, // R/T**2, = -v/T
-		init: function() {
-			this.ta = -this.tv
-		}
+module.exports = function(da) {
+	var itms = []
+	var N = 9
+	for (var i=0; i<N; ++i) {
+		var angle = 2*Math.PI/N*i + da
+		itms[i] = step(curve(
+			[0,0], //center
+			0.23 + 0.13*Math.cos(angle), //radius
+			0.03 - 0.012*Math.cos(angle), //width
+			angle-da, //direction
+			4.5 - 4*Math.cos(angle), //turns
+			3.1 + 0.3*Math.cos(angle), //escape
+			6 // frequency
+		))
 	}
-	itm.init()
-
-	var itm2 = {
-		N: 40,
-		// POSITION
-		px: +0, // %R
-		py: +0,	// %R
-		θ: +Math.PI, // rad
-		// VELOCITY
-		tv: +2, // R/T
-		// SWIRL
-		nt: 2,
-		ω: -2*Math.PI,
-		// Branching
-		nb: 1, // branching / T
-		// CALCULATED / OTHER
-		α: 0,
-		ta: 0, // R/T**2, = -v/T
-		init: function() {
-			this.α = 2 * (2*Math.PI * this.nt - this.ω)
-			this.ta = -this.tv
-		}
-	}
-	itm2.init()
-
-	var opt = assign({
-		//T: 1,
-		//R: 1,
-		thick: 0.05, // uLength/uSpeed = uTime
-		fdraw: 9, // elements/rotation
-		fcalc: 2 // samples/elements = samples/(uRotVel*uTime) =
-	}, options)
-
-	var res = [[itm.px, itm.py, itm.tv]]
-	var res2 = [[itm2.px, itm2.py, itm2.tv]]
-
-	function next() {
-		if (itm.tv < 0) return {done: true, value: [res, res2]}
-		for (var i=0; i<opt.fcalc; ++i) {
-			itm = step(itm, opt)
-			itm2 = step2(itm2, opt)
-		}
-		res.push([itm.px, itm.py, itm.tv])
-		res2.push([itm2.px, itm2.py, itm2.tv])
-		return itm.tv < 0 ? {done: true, value: [res, res2]} : {value: [res, res2]}
-	}
-
-	return {
-		next: next
-	}
+	return itms
 }

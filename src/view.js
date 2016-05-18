@@ -29,8 +29,9 @@ function Bezier(xys) {
 	var d = path('M', xys[0], 'Q', xys[1], mid(xys[1], xys[2]))
 
 	for (var i=3; i<xys.length; i++) {
-		d += path('T', mid(xys[i-1], xys[i]))
+		d += path('L', mid(xys[i-1], xys[i]))
 	}
+	d += path('L', xys[i-1])
 	return d
 }
 
