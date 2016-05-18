@@ -23,6 +23,7 @@ function path(cmd) {
 }
 
 function Bezier(xyvs, d) {
+	console.log(xyvs)
 	return xyvs.length > 3 ? d + path('T', mid(xyvs[xyvs.length-2], xyvs[xyvs.length-1]))
 		: xyvs.length === 3 ? path('M', xyvs[0], 'Q', xyvs[1], mid(xyvs[1], xyvs[2]))
 		: ''
@@ -30,6 +31,7 @@ function Bezier(xyvs, d) {
 
 function curve(set, idx) {
 	ds[idx] = Bezier(set, ds[idx])
+	console.log(idx, ds[idx])
 	return h('g', {key: idx}, [
 		h('path', {attrs: {d: ds[idx] || 'M0,0'}})
 	])
