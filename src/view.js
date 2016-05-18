@@ -1,5 +1,7 @@
 'use-strict'
+/*eslint no-console:0*/
 var h = require('snabbdom/h')
+//var counter = 0
 
 var viewBox = [-1000, -500, 2000, 1000].join(' '),
 		ds = ['', ''],
@@ -22,26 +24,34 @@ function path(cmd) {
 	return res
 }
 
-function Bezier(xyvs, d) {
-	console.log(xyvs)
-	return xyvs.length > 3 ? d + path('T', mid(xyvs[xyvs.length-2], xyvs[xyvs.length-1]))
-		: xyvs.length === 3 ? path('M', xyvs[0], 'Q', xyvs[1], mid(xyvs[1], xyvs[2]))
-		: ''
+function Bezier(xys) {
+	if (xys < 3) return ''
+	var d = path('M', xys[0], 'Q', xys[1], mid(xys[1], xys[2]))
+
+	for (var i=3; i<xys.length; i++) {
+		d += path('T', mid(xys[i-1], xys[i]))
+	}
+	return d
 }
 
-function curve(set, idx) {
-	ds[idx] = Bezier(set, ds[idx])
-	console.log(idx, ds[idx])
+function curve(itm, idx) {
+	ds[idx] = Bezier(itm.xys)
+	//console.log(idx, ds[idx])
 	return h('g', {key: idx}, [
 		h('path', {attrs: {d: ds[idx] || 'M0,0'}})
 	])
 }
 
-module.exports = function(data) {
-	return h('div', [
-		h('svg', {attrs: {viewBox: viewBox, width: '100%'}}, [
-			h('circle', {attrs: {cx: 0, cy: 0, r: 400, stroke: 'green', 'stroke-width': 4, fill: 'yellow'}}),
-			h('g', data.map(curve))
-		])
-	])
+
+module.exports = function(itms) {
+	//console.log(data)
+
+	var curves = itms.map(curve)
+
+
+	var circle = h('circle', {attrs: {cx: 0, cy: 0, r: 400, stroke: 'green', 'stroke-width': 4, fill: 'yellow'}})
+	var svg = h('svg', {attrs: {viewBox: viewBox, width: '100%'}}, [circle].concat(curves))
+	var div = h('div', [svg])
+	//console.log('DIV:', div)
+	return div
 }

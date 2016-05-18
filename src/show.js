@@ -11,7 +11,7 @@ var oldNode = document.getElementById('container') //document.body //
 var styleNode = document.getElementsByTagName('style')[0]
 styleNode.sheet.insertRule('patate{color:red}', 3)
 
-console.log(styleNode.sheet)
+/*console.log(styleNode.sheet)
 console.log(styleNode.sheet.rules)
 console.log(styleNode.sheet.rules.length)
 console.log(styleNode.sheet.rules[0])
@@ -20,7 +20,7 @@ console.log(styleNode.sheet.ownerRule) //CSSStyleSheet.insertRule
 console.log(styleNode.sheet.ownerNode )
 console.log(styleNode.scoped)
 console.log(styleNode.style)
-console.log(document.styleSheets)
+console.log(document.styleSheets)*/
 // innerHTML === innerText === textContent
 
 module.exports = function view(vdom) {
