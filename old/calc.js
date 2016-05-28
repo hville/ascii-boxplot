@@ -110,7 +110,7 @@ function step(itm) {
 
 module.exports = function(da) {
 	var itms = []
-	var N = 9
+	var N = 10
 	for (var i=0; i<N; ++i) {
 		var angle = 2*Math.PI/N*i + da
 		itms[i] = step(curve(
@@ -120,7 +120,7 @@ module.exports = function(da) {
 			angle-da, //direction
 			4.5 - 4*Math.cos(angle), //turns
 			3.1 + 0.3*Math.cos(angle), //escape
-			6 // frequency
+			60 // frequency
 		))
 	}
 	return itms

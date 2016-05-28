@@ -1,6 +1,7 @@
 /* eslint no-console: 0, no-loop-func: 0*/
 'use strict'
-var tt = require('tt')
+var tt = require('tt')//,
+//		patch = require('@private/json-patch')
 
 var setTests = require('../node_modules/json-patch-test-suite/tests.json')
 var setSpecs = require('../node_modules/json-patch-test-suite/spec_tests.json')
