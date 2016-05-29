@@ -2,9 +2,7 @@
 var assign = require('object-assign'),
 		elm = require('./elm')
 
-var view = elm.view,
-		list = elm.list,
-		join = elm.join
+var co = elm.co
 
 module.exports = {
 	table: table,
@@ -13,70 +11,79 @@ module.exports = {
 	cell: cell
 }
 
-//UPDATERS
-function updateValue(v) {
-	this.el.value = v
-}
-function createUpdateKeys(keys) {
-	return function(obj) {
-		this.children.forEach(function(el, i) {
-			if (el.update) el.update(obj[keys[i]], keys[i], obj)
-		})
-	}
-}
-
 //ELEMENTS
 function table(options) {
-	return view('table',
-		view('thead',	row(assign({section: 'thead'}, options))),
+	return co('table',
+		co('thead',	row(assign({section: 'thead'}, options), null, null)),
 		body(options),
-		view('tfoot',	row(assign({section: 'tfoot'}, options)))
+		co('tfoot',	row(assign({section: 'tfoot'}, options), null, null))
 	)
-}
-
-function nestOptions(options, key) {
-	return assign({}, options, {origin: options.origin+'/'+key})
 }
 
 function body(options) {
-	var rowView = row.bind(null, assign({section: 'tbody'}, options))
-	return view('tbody', list(rowView))
-}
-
-function row(options, rec, irow) {
-	var Cells = options.columns.map(function(col) { return col[options.section] }),
-			keys = options.columns.map(function(col) { return col.key })
-
-	var cells = Cells.map(function (View, icol) {
-		return typeof View === 'function' ? View( nestOptions(options, irow+'/'+keys[icol]), rec && rec[keys[icol]], icol)
-			: typeof View === 'object' ? (View.update ? View.update(rec && rec[keys[icol]], icol) : View)
-			: options.section === 'thead' ? view('th', View)
-			: view('td', View)
+	var bodyCo = co('tbody', function updateSelf() {
+		var data = this.pull(),
+				keys = Object.keys(data)
+		if (!this.children) this.children = Array(keys.length)
+		for (var i=0; i<keys.length; ++i) {
+			if (!this.children[i]) this.children[i] = row(assign({section: 'tbody'}, options), data[keys[i]], keys[i])
+		}
+		this.children.length = keys.length
 	})
-	var child=join(cells, createUpdateKeys(keys))
-	//child.update(rec)
-	return view('tr', child)
+
+	return bodyCo
 }
 
-function valueHandler(dispatch, act, pth) {
-	return function(e) {
-		dispatch(act, pth, e.target.value)
+function row(options, rec, kRec) {
+	var keys = options.columns.map(function(col) { return col.key }),
+			rowCo = co('tr')
+			.set('updateSelf', function() {
+				this.keys = this.keys.concat(kRec)
+				this.children = keys.map(createCell)
+			})
+			.set('updateChild', function(child, idx) {
+				if (child.update) child.update(
+					this.data,
+					this.root,
+					keys[idx] === undefined ? this.keys : this.keys.concat(keys[idx]))
+			})
+
+	function createCell(kCol, iCol) {
+		if (rowCo.children && rowCo.children[iCol]) return rowCo.children[iCol]
+		var cnt = options.columns[iCol][options.section] //a cell component or element or view
+		return typeof cnt === 'function' ? cnt(options)
+			: typeof cnt === 'object' ? cnt
+			: options.section === 'thead' ? co('th', cnt)
+			: co('td', cnt)
 	}
+
+	return rowCo
 }
 
 function inputCell(options) {
-	return view('td',
-		view('input', {oninput: valueHandler(options.dispatch, 'r', options.origin)}, updateValue)
-	)
-}
+	var inputCo = co('input', {oninput: inputHandler},	updateValue)
 
-function sumCell(/*options*/) {
-	return view('td', function(undef, key, c) {
-		var sum = c.reduce(function(s, rec) { return +rec[key] + s}, 0)
-		this.el.textContent = sum
-	})
+	function inputHandler(e) {
+		options.dispatch('r', '/' + inputCo.root.concat(inputCo.keys).join('/'), e.target.value)
+	}
+
+	return co('td', inputCo)
 }
 
 function cell(/*options*/) {
-	return view('td', function(v) { this.el.textContent = v })
+	return co('td', function(){ this.el.textContent = this.pull() })
+}
+
+function sumCell(/*options*/) {
+	return co('td')
+		.set('updateSelf', function tdupdater() { //this=window
+			var colKey = this.keys[1] //this=td
+			var sum = this.data.reduce(function(tot, rec) { return +rec[colKey] + tot	}, 0)
+			this.el.textContent = sum
+		})
+}
+
+//UPDATERS
+function updateValue() {
+	this.el.value = this.pull()
 }
