@@ -36,11 +36,6 @@ var columns2 = [
 ]
 
 
-
-
-
-
-
 function dispatch(act, pth, arg) {
 	store = patch([{op:'replace', path:pth, value:arg}], store).doc
 	window.requestAnimationFrame(function() {
@@ -52,8 +47,20 @@ var table =	tableView({origin: '', dispatch: dispatch, columns: columns})
 table.update(store.slice(1))
 frzr.mount(document.body, table)
 
-var update = table.update.bind(table)
+var table2 =	tableView2({origin: '', dispatch: dispatch, columns: columns2})
+table2.update(store.slice(1))
+console.log(table2)
+frzr.mount(document.body, table2)
 
-setTimeout(update, 300, store.slice(2))
+
+var update = table.update.bind(table)
+var update2 = table2.update.bind(table2)
+
+setTimeout(update, 200, store.slice(2))
+setTimeout(update2, 400, store.slice(2))
+
 setTimeout(update, 600, store.slice(0))
-setTimeout(update, 900, store)
+setTimeout(update2, 800, store.slice(0))
+
+setTimeout(update, 1000, store)
+setTimeout(update2, 1200, store)
