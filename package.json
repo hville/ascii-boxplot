@@ -9,9 +9,9 @@
   "author": "Hugo Villeneuve",
   "main": "./index.js",
   "dependencies": {
+    "@private/dom-co": "^0.1.1",
     "@private/json-patch": "^0.1.2",
     "@private/norm-dist": "^0.0.4",
-    "frzr": "^0.18.3",
     "milligram": "^1.1.0",
     "object-assign": "4.1.0",
     "picnic": "^4.1.2"

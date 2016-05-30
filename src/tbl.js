@@ -1,8 +1,8 @@
 'use-strict'
 var assign = require('object-assign'),
-		elm = require('./elm')
+		domCo = require('@private/dom-co')
 
-var co = elm.co
+var co = domCo.co
 
 module.exports = {
 	table: table,

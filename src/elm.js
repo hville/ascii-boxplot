@@ -1,5 +1,6 @@
 'use-strict'
-var frzr = require('frzr')
+//var frzr = require('frzr')
+var frzr = require('./dom')
 
 module.exports = {
 	Co: Co,

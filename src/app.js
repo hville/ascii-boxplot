@@ -1,5 +1,5 @@
 'use-strict'
-var frzr = require('frzr'),
+var domCo = require('@private/dom-co'),
 		patch = require('@private/json-patch'),
 		tableViews = require('./tbl')
 
@@ -15,9 +15,9 @@ var tableView = tableViews.table,
 		cell = tableViews.cell
 
 var columns = [
-	{key: 'id', tbody:cell, thead: frzr.el('th', 'myid1'), tfoot: frzr.el('th', 'myid1')},
-	{key: 'val', tbody:inputCell, thead: frzr.el('th', 'myid2'), tfoot: sumCell},
-	{key: 'txt', tbody:inputCell, thead: frzr.el('th', 'myid3'), tfoot: 'justText'}
+	{key: 'id', tbody:cell, thead: domCo.el('th', 'myid1'), tfoot: domCo.el('th', 'myid1')},
+	{key: 'val', tbody:inputCell, thead: domCo.el('th', 'myid2'), tfoot: sumCell},
+	{key: 'txt', tbody:inputCell, thead: domCo.el('th', 'myid3'), tfoot: 'justText'}
 ]
 
 function dispatch(act, pth, arg) {
@@ -29,7 +29,7 @@ function dispatch(act, pth, arg) {
 
 var table =	tableView({origin: '', dispatch: dispatch, columns: columns})
 table.update(store.slice(1))
-frzr.mount(document.body, table)
+domCo.mount(document.body, table)
 
 var update = table.update.bind(table)
 
