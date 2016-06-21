@@ -1,40 +1,29 @@
 'use-strict'
-var domCo = require('@private/dom-co'),
-		patch = require('@private/json-patch'),
-		tableViews = require('./tbl')
+/* eslint no-console:0 */
+var //allTypes = require('./types'),
+		gmap = require('./map'),
+		user = require('./usr')
 
-var store = [
-	{id: 'one', val: 1, txt: '1'},
-	{id: 'two', val: 2, txt: '2'},
-	{id: 'six', val: 2, txt: '3'}
-]
+var userTypes = user.types,
+		userLocation = user.location,
+		topTypes = Object.keys(userTypes).sort(weightSorter).slice(0,5).map(typesMapper)
 
-var tableView = tableViews.table,
-		inputCell = tableViews.inputCell,
-		sumCell = tableViews.sumCell,
-		cell = tableViews.cell
+function weightSorter(a, b) {
+	return Math.abs(userTypes[b]) - Math.abs(userTypes[a])
+}
+function typesMapper(name) {
+	return { name: name, weight: userTypes[name] }
+}
 
-var columns = [
-	{key: 'id', tbody:cell, thead: domCo.el('th', 'myid1'), tfoot: domCo.el('th', 'myid1')},
-	{key: 'val', tbody:inputCell, thead: domCo.el('th', 'myid2'), tfoot: sumCell},
-	{key: 'txt', tbody:inputCell, thead: domCo.el('th', 'myid3'), tfoot: 'justText'}
-]
-
-function dispatch(act, pth, arg) {
-	store = patch([{op:'replace', path:pth, value:arg}], store).doc
-	window.requestAnimationFrame(function() {
-		table.update(store)
+gmap.onmsg = function (context) {
+	window.requestAnimationFrame(function(ms) {
+		console.log('RAF', ms)
+		console.log('RENDER HEATMAP with', context.places.length, 'locations')
+		for (var i=0; i<context.typeList.length; ++i) {
+			console.log(context.typeList[i].name, 'weight:', context.typeList[i].weight, 'count:', context.typeResults[i].length)
+		}
+		context.render()
 	})
 }
 
-var table =	tableView({origin: '', dispatch: dispatch, columns: columns})
-table.update(store.slice(1))
-domCo.mount(document.body, table)
-
-var update = table.update.bind(table)
-
-setTimeout(update, 200, store.slice(2))
-
-setTimeout(update, 600, store.slice(0))
-
-setTimeout(update, 1000, store)
+gmap.postMsg(userLocation, topTypes, 10000)
