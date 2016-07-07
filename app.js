@@ -1,2 +1,319 @@
-!function(t){function r(e){if(n[e])return n[e].exports;var o=n[e]={exports:{},id:e,loaded:!1};return t[e].call(o.exports,o,o.exports,r),o.loaded=!0,o.exports}var n={};return r.m=t,r.c=n,r.p="",r(0)}([function(t,r,n){"use-strict";function e(t,r,n){f=i([{op:"replace",path:r,value:n}],f).doc,window.requestAnimationFrame(function(t){d.update(f)})}var o=n(1),i=n(2),u=n(3),f=[{id:"one",val:1,txt:"1"},{id:"two",val:2,txt:"2"},{id:"six",val:2,txt:"3"}],a=u.table,c=u.inputCell,l=u.sumCell,s=[{key:"id",tbody:c,thead:o.el("th","myid1"),tfoot:o.el("th","myid1")},{key:"val",tbody:c,thead:o.el("th","myid2"),tfoot:l},{key:"txt",tbody:c,thead:o.el("th","myid3"),tfoot:"justText"}],d=a({origin:"",dispatch:e,columns:s});d.update(f),o.mount(document.body,d)},function(t,r,n){!function(t,n){n(r)}(this,function(t){"use strict";function r(t){return document.createTextNode(t)}function n(t){if(d){var r=d[t];if(r)return r.apply(this,arguments)}for(var n=document.createElement(t),e=1;e<arguments.length;e++){var o=arguments[e];if(null!=o&&!a(n,o)&&"object"==typeof o)for(var i in o){if(h){var u=h[i];if(u){u(n,o[i]);continue}}var f=o[i];"style"===i||null==n[i]&&"function"!=typeof f?n.setAttribute(i,f):n[i]=f}}return n}function e(t,r){d||(d={}),d[t]=r}function o(t,r){h||(h={}),h[t]=r}function i(t){d&&d[t]&&delete d[t]}function u(t){h&&h[t]&&delete h[t]}function f(t){for(var r=document.createElementNS("http://www.w3.org/2000/svg",t),n=1;n<arguments.length;n++){var e=arguments[n];if(null!=e&&!a(r,e)&&"object"==typeof e)for(var o in e)r.setAttribute(o,e[o])}return r}function a(t,r,n){var e=t.el||t,o=r.el||r,i=null!=o.parentNode;if(i?r.remounting&&r.remounting():r.mounting&&r.mounting(),o instanceof Node){if(n){var u=n.el||n;e.insertBefore(o,u)}else e.appendChild(o);i?r.remounted&&r.remounted():r.mounted&&r.mounted(),o!==r&&(o.view=r,r.parent=t)}else if("string"==typeof o||"number"==typeof o)a(e,document.createTextNode(o),n);else{if(!(o instanceof Array))return!1;for(var f=0;f<o.length;f++)a(e,o[f],n)}return!0}function c(t,r,n){var e=t.el||t,o=r.el||r,i=n.el||n,u=null!=o.parentNode;n.unmounting&&n.unmounting(),u?r.remounting&&r.remounting():r.mounting&&r.mounting(),e.replaceChild(o,i),n.unmounted&&n.unmounted(),i!==n&&(n.parent=null),u?r.remounted&&r.remounted():r.mounted&&r.mounted(),o!==r&&(o.view=r,r.parent=t)}function l(t,r){var n=t.el||t,e=r.el||r;r.unmounting&&r.unmounting(),n.removeChild(e),r.unmounted&&r.unmounted(),e!==r&&(r.parent=null)}function s(t,r){for(var n=t.el||t,e=n.firstChild,o=0;o<r.length;o++){var i=r[o],u=i.el||i;e!==u?a(t,i,e):e=e.nextSibling}for(;e;){var f=e.nextSibling;l(t,e.view||e),e=f}}var d,h,p=a;t.text=r,t.el=n,t.registerElement=e,t.registerAttribute=o,t.unregisterElement=i,t.unregisterAttribute=u,t.svg=f,t.mount=a,t.mountBefore=p,t.replace=c,t.unmount=l,t.setChildren=s})},function(t,r){function n(t,r,n,e){var i,u,f,a,c=n[n.length-1];if(1===n.length)return t(r,c,e);i=r;for(var l=0;l<n.length-2;++l)if(i[n[l]]=o(i[n[l]]),i=i[n[l]],void 0===i)return Error("path");return u=n[l],f=i[u],f&&"object"==typeof f?(a=t(f,c,e),a instanceof Error?a:a===f?r:(i[u]=a,r)):Error("path")}function e(t){if(void 0!==t){var r=t.split("/"),n=-1!==t.indexOf("~");if(""===r[0]){r[0]="doc";for(var e=1;e<r.length;++e)n&&-1!==r[e].indexOf("~")&&(r[e]=r[e].replace(s,"/").replace(d,"~"));return r}}}function o(t){if(Array.isArray(t))return t.slice();for(var r=0,n=Object.keys(t),e={};r<n.length;++r)e[n[r]]=t[n[r]];return e}function i(t,r){if(t===r)return!0;if(Array.isArray(t)&&Array.isArray(r)){if(t.length!==r.length)return;for(var n=0;n<t.length;++n)if(!i(t[n],r[n]))return;return!0}if(t&&r&&"object"==typeof t&&"object"==typeof r){var e=Object.keys(t).sort(),o=Object.keys(r).sort();if(e.length!==o.length)return;for(n=0;n<e.length;++n)if(!i(t[e[n]],r[o[n]]))return;return!0}}function u(t,r,n,e){return t.name=n.op+"Error",t.message="Patch item #"+e+" failed at "+t.message+":"+n[t.message],{doc:r,err:t}}function f(t,r,n){if(void 0===n)return Error("value");if(t[r]===n)return t;if(void 0===t[r])return Error("path");var e=o(t);return e[r]=n,e}function a(t,r){if(void 0===t[r])return Error("path");var n;if(Array.isArray(t))n=t.slice(),n.splice(r,1);else{n={};for(var e=0,o=Object.keys(t);e<o.length;++e)o[e]!==r&&(n[o[e]]=t[o[e]])}return n}function c(t,r,n){if(void 0===n)return Error("value");var e=o(t);return Array.isArray(t)?"-"===r||r===""+t.length?(e.push(n),e):void 0===t[r]?Error("path"):(e.splice(r,0,n),e):t[r]===n?t:(e[r]=n,e)}t.exports=function(t,r){var n,o,i,f={doc:r||{}};for(n=0;n<t.length;++n){if(i=t[n],o=e(i.path),!o)return u(Error("path"),r,i,n);if(!l[i.op])return u(Error("op"),r,i,n);if(f=l[i.op](f,i,o),f instanceof Error)return u(f,r,i,n)}return f};var l={test:function(t,r,n){for(var e=t,o=0;o<n.length;++o)if(e=e[n[o]],void 0===e)return Error("path");return i(e,r.value)?t:Error("value")},remove:function(t,r,e){return n(a,t,e)},add:function(t,r,e){return n(c,t,e,r.value)},replace:function(t,r,e){return n(f,t,e,r.value)},move:function(t,r,o){var i=e(r.from);if(!i)return Error("from");for(var u=t,f=0;f<i.length;++f)if(u=u[i[f]],void 0===u)return Error("from");return t=n(a,t,i),n(c,t,o,u)},copy:function(t,r,o){var i=e(r.from);if(!i)return Error("from");for(var u=t,f=0;f<i.length;++f)if(u=u[i[f]],void 0===u)return Error("from");return n(c,t,o,u)}},s=/~1/g,d=/~0/g},function(t,r,n){"use-strict";function e(t){return t instanceof Node||t instanceof i||"string"==typeof t||"number"==typeof t}function o(t){return Array.isArray(t)?t.every(function(t){return e(t)||o(t)}):t instanceof u}function i(t,r,n,e){var o=[t];r&&o.push(r),this.child=n.length?a(n):null,this.child&&o.push(this.child.els),this.el=O.el.apply(null,o),this.update=e||l}function u(t,r){this.els=Array.isArray(t)?t:[t],this.update=r||d}function f(){for(var t,r,n="",u=[],f=0;f<arguments.length;++f)0===f&&"string"==typeof arguments[0]?n=arguments[0]:"function"==typeof arguments[f]?r=arguments[f]:2>f&&!e(arguments[f])&&!o(arguments[f])?t=arguments[f]:u=u.concat(arguments[f]);return new i(n||"div",t,u,r)}function a(){for(var t,r=[],n=0;n<arguments.length;++n)o(arguments[n])||e(arguments[n])?r=r.concat(arguments[n]):"function"==typeof arguments[n]&&(t=arguments[n]);return 1===r.length&&o(r[0])?t?new u(r[0].els,t):r[0]:new u(r,t)}function c(t){return new u([],p(t))}function l(t,r,n){this.child&&(this.child.update(t,r,n),O.setChildren(this.el,this.child.el||this.child.els))}function s(t){this.el.value=t}function d(t,r,n){this.els.forEach(function(e){e.update&&e.update(t,r,n)})}function h(t){return function(r){this.els.forEach(function(n,e){n.update&&n.update(r[t[e]],t[e],r)})}}function p(t){return function(r){for(var n=0;n<r.length;++n)this.els[n]||(this.els[n]=t(r[n],n,r)),this.els[n].update(r[n],n,r);this.els.length=n}}function v(t){return f("table",f("thead",y(w({section:"thead"},t))),g(t),f("tfoot",y(w({section:"tfoot"},t))))}function m(t,r){return w({},t,{origin:t.origin+"/"+r})}function g(t){var r=y.bind(null,w({section:"tbody"},t));return f("tbody",c(r))}function y(t,r,n){var e=t.columns.map(function(r){return r[t.section]}),o=t.columns.map(function(t){return t.key}),i=e.map(function(e,i){return"function"!=typeof e?e:e(m(t,n+"/"+o[i]),r&&r[o[i]],i)});return f("tr",a(i,h(o)))}function b(t,r,n){return function(e){t(r,n,e.target.value)}}function j(t){return f("td",f("input",{oninput:b(t.dispatch,"r",t.origin)},s))}function E(){return f("td",function(t,r,n){var e=n.reduce(function(t,n){return+n[r]+t},0);this.el.textContent=e})}var O=n(1),w=n(4);t.exports={table:v,inputCell:j,sumCell:E}},function(t,r){"use strict";function n(t){if(null===t||void 0===t)throw new TypeError("Object.assign cannot be called with null or undefined");return Object(t)}function e(){try{if(!Object.assign)return!1;var t=new String("abc");if(t[5]="de","5"===Object.getOwnPropertyNames(t)[0])return!1;for(var r={},n=0;10>n;n++)r["_"+String.fromCharCode(n)]=n;var e=Object.getOwnPropertyNames(r).map(function(t){return r[t]});if("0123456789"!==e.join(""))return!1;var o={};return"abcdefghijklmnopqrst".split("").forEach(function(t){o[t]=t}),"abcdefghijklmnopqrst"===Object.keys(Object.assign({},o)).join("")}catch(i){return!1}}var o=Object.prototype.hasOwnProperty,i=Object.prototype.propertyIsEnumerable;t.exports=e()?Object.assign:function(t,r){for(var e,u,f=n(t),a=1;a<arguments.length;a++){e=Object(arguments[a]);for(var c in e)o.call(e,c)&&(f[c]=e[c]);if(Object.getOwnPropertySymbols){u=Object.getOwnPropertySymbols(e);for(var l=0;l<u.length;l++)i.call(e,u[l])&&(f[u[l]]=e[u[l]])}}return f}}]);
+/******/ (function(modules) { // webpackBootstrap
+/******/ 	// The module cache
+/******/ 	var installedModules = {};
+/******/
+/******/ 	// The require function
+/******/ 	function __webpack_require__(moduleId) {
+/******/
+/******/ 		// Check if module is in cache
+/******/ 		if(installedModules[moduleId])
+/******/ 			return installedModules[moduleId].exports;
+/******/
+/******/ 		// Create a new module (and put it into the cache)
+/******/ 		var module = installedModules[moduleId] = {
+/******/ 			i: moduleId,
+/******/ 			l: false,
+/******/ 			exports: {}
+/******/ 		};
+/******/
+/******/ 		// Execute the module function
+/******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
+/******/
+/******/ 		// Flag the module as loaded
+/******/ 		module.l = true;
+/******/
+/******/ 		// Return the exports of the module
+/******/ 		return module.exports;
+/******/ 	}
+/******/
+/******/
+/******/ 	// expose the modules object (__webpack_modules__)
+/******/ 	__webpack_require__.m = modules;
+/******/
+/******/ 	// expose the module cache
+/******/ 	__webpack_require__.c = installedModules;
+/******/
+/******/ 	// identity function for calling harmory imports with the correct context
+/******/ 	__webpack_require__.i = function(value) { return value; };
+/******/
+/******/ 	// define getter function for harmory exports
+/******/ 	__webpack_require__.d = function(exports, name, getter) {
+/******/ 		Object.defineProperty(exports, name, {
+/******/ 			configurable: false,
+/******/ 			enumerable: true,
+/******/ 			get: getter
+/******/ 		});
+/******/ 	};
+/******/
+/******/ 	// Object.prototype.hasOwnProperty.call
+/******/ 	__webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
+/******/
+/******/ 	// __webpack_public_path__
+/******/ 	__webpack_require__.p = "";
+/******/
+/******/ 	// Load entry module and return exports
+/******/ 	return __webpack_require__(__webpack_require__.s = 2);
+/******/ })
+/************************************************************************/
+/******/ ([
+/* 0 */
+/***/ function(module, exports, __webpack_require__) {
+
+var user = __webpack_require__(3),
+		Store = __webpack_require__(!(function webpackMissingModule() { var e = new Error("Cannot find module \"./mini-store\""); e.code = 'MODULE_NOT_FOUND'; throw e; }()))
+
+module.exports = UserStore
+
+function weightSorter(a, b) {
+	return Math.abs(user.types[b]) - Math.abs(user.types[a])
+}
+
+function typesMapper(name) {
+	return { name: name, weight: user.types[name] }
+}
+
+function UserStore(cb) {
+	for (var key in user) {
+		if (localStorage[key]) user[key] = JSON.parse(localStorage[key])
+		else localStorage[key] = JSON.stringify(user[key])
+	}
+
+	user.meta = ''
+	user.list = Object.keys(user.types).sort(weightSorter).map(typesMapper) //[{name, weight}]
+	user.hmap = [] //{id, loc, typ, wgt}
+
+	return Store(user, function(n,p,o) {
+		for (var k in n) {
+			if (n[k] !== o[k]) localStorage[k] = JSON.stringify(n[k])
+		}
+		cb(n,p,o)
+	})
+}
+
+
+/***/ },
+/* 1 */
+/***/ function(module, exports) {
+
+/* global google */
+
+var goo = null,
+		//pok = null,
+		map = null,
+		//srv = null,
+		//typ = [],
+		src,
+		//lst = [],
+		city
+
+module.exports = function init(store, callback) {
+	if (typeof google === 'undefined') return window.onload = init.bind(null, store, callback)
+	goo = google.maps
+	//pok = goo.places.PlacesServiceStatus.OK
+
+	map = createMapCo('map', store)
+	src = store
+	city = createCityCo('city')
+	//srv = goo.places.PlacesService(map.el)
+	callback({map: map, city:city})
+}
+
+function createMapCo(id, store) {
+	var el = document.getElementById(id),
+			hot = new google.maps.visualization.HeatmapLayer()
+
+	var gm = new google.maps.Map(el, {
+		zoom: 8,
+		center: {lat: -34.397, lng: 150.644}
+	})
+
+	gm.addListener('zoom_changed', function() {
+		store([['r', ['mapOptions', 'zoom'], gm.getZoom()]])
+	})
+	gm.addListener('center_changed', function() {
+		store([['r', ['mapOptions', 'center'], gm.getCenter()]])
+	})
+	return {
+		el: el,
+		view: function(n, p, o) {
+			//if (n.mapOptions.center !== o.mapOptions.center) gm.setCenter({lat: -34.397, lng: 150.644})
+			if (n.mapOptions.zoom !== o.mapOptions.zoom) gm.setZoom(n.mapOptions.zoom)
+			if (n.heatMap !== o.heatMap) hot.setOptions(n.heatMap)
+			if (!hot.getMap()) hot.setMap(gm)
+		},
+		store: function() {},
+		on: {}
+	}
+}
+
+function createCityCo(id) {
+	var el = document.getElementById(id),
+			ac = new goo.places.Autocomplete(el, {types: ['(cities)']})
+
+	ac.addListener('place_changed', function() {
+		var place = ac.getPlace()
+		console.log('place_changed', place, place.address_components)
+		src([
+			['r',	['city'], {
+				id: place.place_id,
+				address: place.address_components[1],
+				name: place.name,
+				location: place.geometry.location
+			}],
+			['a', ['log', '-'], 'AutoComplete getPlace(): '+place.toString()]
+		])
+	})
+
+	return {
+		el: el,
+		view: function() { console.log('ac view')}
+	}
+}
+
+/*function getTyp(ctr, key, rad) {
+	ctx.typ.push(key)
+	//console.log('SEARCHING type '+key+' in '+ctr.toString(), 'meta')
+	ctx.srv.radarSearch({
+		location: ctr, //OR bounds: map.getBounds()
+		radius: rad,
+		type: key
+	}, function(res, status) {
+		if (status !== ctx.pok) return callback('err', 'radarSearch error')
+		ctx.lst.push(res)
+		callback('typ', ctx)
+	})
+}
+*/
+
+
+/***/ },
+/* 2 */
+/***/ function(module, exports, __webpack_require__) {
+
+'use-strict'
+/* eslint no-console:0 */
+
+var Data = __webpack_require__(0),
+		goog = __webpack_require__(1),
+		Co = __webpack_require__(!(function webpackMissingModule() { var e = new Error("Cannot find module \"./co\""); e.code = 'MODULE_NOT_FOUND'; throw e; }())),
+		viewstore = __webpack_require__(!(function webpackMissingModule() { var e = new Error("Cannot find module \"@private/mini-view-store\""); e.code = 'MODULE_NOT_FOUND'; throw e; }()))
+
+var co = new Co(),
+		data = Data(scheduleRender),
+		//typeIn = document.getElementById('type'),
+		//optsIn = document.getElementById('options'),
+		oldState = {},
+		newState = {},
+		fullPatch = [],
+		rafId = NaN
+
+goog(data, function(res) {
+	co.register(res.map)
+	co.register(res.city)
+})
+
+co.register({
+	el: document.getElementById('footer'),
+	view: function(n, p, o) {
+		for (var i=o.log.length; i<n.log.length; ++i) this.el.appendChild(document.createTextNode(n.log[i]))
+	}
+})
+
+/*function typMapper(ctx) {
+	var typ = this.typ
+	var types = data.get('types')
+	return {
+		id: itm.place_id,
+		location: itm.geometry.location,
+		type: typ,
+		weight: types[typ]
+	}
+}
+*/
+
+function scheduleRender(n, p) {
+	newState = n
+	Array.prototype.push.apply(fullPatch, p)
+	if (rafId === null) rafId = window.requestAnimationFrame(render)
+}
+
+function render() {
+	co.view(newState, fullPatch, oldState)
+	oldState = newState
+	fullPatch = []
+}
+
+
+/***/ },
+/* 3 */
+/***/ function(module, exports) {
+
+module.exports = {
+	city: {
+		id: null,
+		address: 'ho chi minh, district 2',
+		name: 'ho chi minh, district 2',
+		location: null
+	},
+	radius: 10000,
+	log: [],
+	mapOptions: {
+		center: {lat: -34.397, lng: 150.644},
+		zoom: 12
+	},
+	heatMap: {
+		data: [],
+		opacity: 0.5, //default 0.6
+		dissipating: true, //default true(shape independent of zoom) false(shape grows on zoom)
+		radius: 20 //datapoint in pixels
+	},
+	list: [], //{ name: name, weight: user.types[name] }
+	types: {
+		airport: -3,
+		art_gallery: 4,
+		atm: 1,
+		bakery: 3,
+		bank: 1,
+		bar: 2,
+		bicycle_store: 2,
+		book_store: 3,
+		bus_station: 1,
+		cafe: 9,
+		campground: -1,
+		car_dealer: -1,
+		car_rental: -1,
+		car_repair: -2,
+		car_wash: -2,
+		cemetery: 2,
+		church: 1,
+		embassy: 2,
+		furniture_store: -1,
+		gas_station: -3,
+		gym: 1,
+		laundry: 1,
+		library: 2,
+		liquor_store: 1,
+		lodging: 2,
+		museum: 4,
+		night_club: 2,
+		park: 4,
+		parking: 1,
+		pharmacy: 1,
+		restaurant: 5,
+		rv_park: -1,
+		school: 1,
+		stadium: -1,
+		storage: -1,
+		store: 2,
+		subway_station: 5,
+		taxi_stand: 2,
+		train_station: 6,
+		transit_station: 7,
+		university: 8
+	}
+}
+
+
+/***/ }
+/******/ ]);
 //# sourceMappingURL=app.js.map

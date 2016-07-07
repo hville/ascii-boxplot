@@ -9,17 +9,17 @@
   "author": "Hugo Villeneuve",
   "main": "./index.js",
   "dependencies": {
-    "@private/dom-co": "^0.1.1",
-    "@private/json-patch": "^0.1.2",
+    "@private/dom-co": "^1.3.0",
+    "@private/json-patch": "^1.1.0",
+    "@private/mini-view-store": "^0.2.0",
     "@private/norm-dist": "^0.0.4",
     "milligram": "^1.1.0",
     "object-assign": "4.1.0",
-    "picnic": "^4.1.2"
+    "picnic": "^6.1.1"
   },
   "devDependencies": {
-    "tachyons": "^4.0.0-beta.28",
     "tt": "^1.0.3",
-    "untap": "0.2.2"
+    "untap": "^0.3.2"
   },
   "scripts": {
     "test": "untap ./tst",

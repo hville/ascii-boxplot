@@ -1,29 +1,41 @@
 'use-strict'
 /* eslint no-console:0 */
-var //allTypes = require('./types'),
-		gmap = require('./map'),
-		user = require('./usr')
 
-var userTypes = user.types,
-		userLocation = user.location,
-		topTypes = Object.keys(userTypes).sort(weightSorter).slice(0,5).map(typesMapper)
+var user = require('./data'),
+		goog = require('./goog'),
+		h = require('@private/dom-co'),
+		makeStore = require('./store')
 
-function weightSorter(a, b) {
-	return Math.abs(userTypes[b]) - Math.abs(userTypes[a])
+var components = [],
+		store = makeStore(components)
+		//store = viewstore(onStoreChange)
+		//elInputType = document.getElementById('type'),
+		//elInputType = document.getElementById('options'),
+
+/*
+	COMPONENTS REGISTRATION
+*/
+goog(store.sub('map'), function(res) {
+	components.push(res.map, res.city)
+})
+
+components.push(h(document.getElementById('footer'), {
+	store: store.sub('log'),
+	view: function(n, p, o) {
+		if (!this.store.has(p)) return
+		var lastIndex = o.log && o.log.length || 0
+		for (var i=lastIndex; i<n.log.length; ++i) this.el.appendChild(document.createTextNode(n.log[i]))
+	}
+}))
+
+/*function typMapper(ctx) {
+	var typ = this.typ
+	var types = data.get('types')
+	return {
+		id: itm.place_id,
+		location: itm.geometry.location,
+		type: typ,
+		weight: types[typ]
+	}
 }
-function typesMapper(name) {
-	return { name: name, weight: userTypes[name] }
-}
-
-gmap.onmsg = function (context) {
-	window.requestAnimationFrame(function(ms) {
-		console.log('RAF', ms)
-		console.log('RENDER HEATMAP with', context.places.length, 'locations')
-		for (var i=0; i<context.typeList.length; ++i) {
-			console.log(context.typeList[i].name, 'weight:', context.typeList[i].weight, 'count:', context.typeResults[i].length)
-		}
-		context.render()
-	})
-}
-
-gmap.postMsg(userLocation, topTypes, 10000)
+*/

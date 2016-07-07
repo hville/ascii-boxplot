@@ -1,165 +1,121 @@
 # TODO
-* +test ~ before regex ++faster
-* +CONCAT ++smaller, +faster
-* +MainFunction ~smaller +faster
-* ~MAPLOOKUP ~smaller, ~faster
-* imm|mut versions ?
-* ?split arr|obj ops ???
-* README
+## Collection Path
+`id = collection[0].id; path = ['collection', '0', 'id']`
+If the data is resorted, the id no longer matches the index
 
+## CONCLUSION
+### URI STYLE
+* `&` or `;` for AND: `?id=x&val=3&closed=` or `?id=x;val=3;closed=`
+* `,` for OR `?id=x,val=3,closed=`
+* `...&x=&...` for undefined
+* `...&sold&...` for truthy
 
-# Introduction
-# Goals
-* atomic - the source document is not modified if the patch fails
-* small and focused - only about applying a patch
-* does not throw - the response includes the document and the errors if any.
-
-# Use Cases
-* immutable - shallow clones: document AND patch values are never changed
-	* `result = patcher(smallPatch, anyDoc)` shallow clones on every path and every item
-* mutable - NOT ATOMIC document and patches are changed. Clone First
-	* `result = patcher(clone(smallPatch), clone(anyDoc))` 1-clone
-* megaDoc - miniPatch: immutable - small changes
-* miniDoc - megaPatch: mutable - big|all changed
-* mega - mega - ???
-* mini - mini - ???
-*
-
-`myNewDoc = treatResultOrErrors( patcher( preprocessor(customPatch), myDoc )`
-
-
-#ideas
-* patcher(patch)
-	* patch first: `(patch, document) => document'`
-	* `doc===undefined`
-	* no cloning required: `MUTABLE`
-* !doc || typeof doc !== object `MUTABLE`
-* preprocessor query > prepath parent validation > path Array param
-
-
-
-#benchmarks
-
-## imm
-starcounterjack 681-666-617-660-679-600-558-591-604
-*minimu 297-304*-300-295-302-292 noegex-preregex 513 mainfcn 462-494
-jiff 165-178-170-173-175-157-147-152
-*miniim* SWITCH:150-141-143-143-147 lookup 148 splitAdd 140 concat 135 noegex 185-144 preregex 137 mainfcn 154-158
-rfc 129 130 131 123 126-128-123-125
-dharma 112 119 109 109 119-107-112-111
-
-
-
-
-**/cars/?color=blue&type=sedan&doors=4**
-**/cars/color:blue/type:sedan/doors:4**
-**/cars/doors/4/name/cam*/colors/red,blue,green **
-/cars?color=blue&type=sedan&doors=4
-color=blue&type=sedan&doors=4/engines
-/cars?color=blue;type=sedan	 #most prefered by me
-/cars;color-blue+doors-4+type-sedan	 #looks good when using car-id
-/cars?color=blue&doors=4&type=sedan	 #I don't recommend using &*
-/cars[?;]color[=-:]blue[,;+&]
-/cars?color=black,blue,red;doors=3,5;type=sedan	 #most prefered by me
-/cars?color:black:blue:red;doors:3:5;type:sedan
-/cars?color(black,blue,red);doors(3,5);type(sedan)	 #does not look bad at all
-/cars?color:(black,blue,red);doors:(3,5);type:sedan	 #little difference
-To search any cars, but not black and red:
-?color=!black,!red
-color:(!black,!red)
-/garage[id=1-20,101-103,999,!5]/cars[color=red,blue,black;doors=3]
-generic delimeters: :/?#[]@
-sub-delimeters: !$&'()*+,;=
-The CSS3 Selectors module introduces three new attribute selectors, which are grouped together under the heading “Substring Matching Attribute Selectors”.
-These new selectors are as follows:
-[att^=val] – the “begins with” selector
-[att$=val] – the “ends with” selector
-[att*=val] – the “contains” selector
-'http://localhost:9200/twitter/tweet/_search?q=user:kimchy'
-/path/file-name.suffix?query-string#hash
-/path.html?p1=v1&p2=v2#more-details
-
+### MAYBE
 `/foo?id=hu` : all prop where id===hu => `/foo/0`
 `/foo?id=hu/name` : all prop where id===hu => `/foo/0/name`
-
 `/foo/?id=hu` : first prop where id===hu => `/foo/0`
 `/foo/?id=hu/name` : all prop where id===hu => `/foo/0/name`
 `/foo/*id=hu` : all props where id===hu => `[/foo/0, /foo/1]`
+`-` for neg numbers
+* JsonPinter Escapes `~0:~`, `~1:/`
+- `~2:?`, `~3:&`, `~4|`, `~5:*`, !, ^
 
+### PATH STYLE
+* array: `['collection', '0', 'id']` => `['collection', '?id=key', 'val']`
+* pointer: `['collection', '0', 'id']` => `/collection/?id=key/val']`
 
+## OTHER
+regex: [a, b, /^.$/, ]
+Glob: /a/b/**/c/*/?ar, /[0-2]/[abc]/?/[!abc]
 
-HUPinter
-JsonPinter ~, /
-~2 => ?
-~3 => &
-~4 => |
-~5 => *
-!
-^
+# BACKGROUND
+## REQUIREMENTS
+* need to access specific key, regardless of index `first index where id=key`
+* need to be a string to be used inside a JSON pointer or a path array
+- need to specify if one or many results `all indices where id=key`
+- ?multiple `all | first index WHERE id=key AND ready=true`
 
+## CSS3 SELECTORS
+for ideas only.
+`[att^=val]` – the “begins with” selector
+`[att$=val]` – the “ends with” selector
+`[att*=val]` – the “contains” selector
+`[att]` – all where att === true
+`[att~=val]` – strick equal
+`[att|=val]` – ???
+`[?:first-child]` – ???
 
-/a/b/?c=1&d=2|e=f/
-/a/b/*/?id=3
+## [URI](http://www.ietf.org/rfc/rfc3986.txt)
+safe: `~-_A-Za-z0-9`
+query: `? query # fragment` eg. `?name=ferret#nose`
+url encoding: `*~-._A-Za-z0-9` are left as-is
+uri: `!$&'()*+,;=` are permitted by generic URI unencoded in the user information, host, and path as delimiters
+...the semicolon (";"), comma (",") and equals ("=") reserved characters are often used to delimit parameters and parameter
+For example,
+one URI producer might use a segment such as `name;v=1.1` to indicate a reference to version 1.1 of "name",
+whereas another might use a segment such as `name,1.1` to indicate the same
+Thus commas are explicitly allowed within query strings
 
+## [URI TEMPLATE DRAFT](https://datatracker.ietf.org/doc/rfc6570/)
+`http://www.example.com/foo?query=mycelium&number=100`
+ `.../content?parentList=15,16&type=note`
+`?list=val1&list=val2&list=val3`
+`http://example.com/search?q=chien&lang=fr`
+`?x=1024&y=768&empty=` - for undefined values
 
-<a href="http://delicious.com/post?url=http://domain.tld/&title=The title of a post">Bookmark at Delicious</a>
-PUT /gists/:id/star
-GET /tickets?state=open
-GET /tickets?sort=-priority
-GET /tickets?state=closed&sort=-updated_at
-http://maps.googleapis.com/maps/api/geocode/json?address=los+angeles,+ca&sensor=false
+## SOMEWHERE ON THE NET
+* `/cars/?color=blue&type=sedan&doors=4`
+* `/cars?color=blue;type=sedan`
+* `/cars?color=black,blue,red;doors=3,5;type=sedan`
+To search any cars, but not black and red:
+`?color=!black,!red`
+`color:(!black,!red)`
 
+* github sagold/json-library
+	* glob: `#/usr/**/*/pw`
+	* filter: `#/input/*?valid:true`
+	* regex pointer: `#/input/{name-.*}/id`
+	* `#/pointer/{regex.*}/**/*?property:hasValue||property:otherValue`
 
-H1 pointer Query
-/a/b/d=1&e=2,f=3/patate
+* http://jmespath.org/
+locations[?state == 'WA'].name | sort(@) | {WashingtonCities: join(', ', @)}
+people[*].first
 
-H2 array
-[a,b,*,?d=1&e=2|f=3,patate]
+* npm json-query 4900dwld/m
+`people[country=NZ].name` find the index in people where country=NZ
+`lookup[*]`
+`people[* rating >= 3 & starred = true]`
 
-H2 regex
-[a, b, /^.$/, ]
-
-Glob
-/a/b/**/c/*/?ar
-/[0-2]/[abc]/?/[!abc]
-
-URL Query String
-/over/there?name=ferret
-field1=value1&field1=value2&field2=value3
-
-github sagold/json-library
-glob pointer: #/usr/**/*/pw; #/input/*?valid:true
-regex pointer: #/input/{name-.*}/id
 
 github steenk/key-value-pointer
 regex: pointer: /^abc$/
 
-jsonapi.org
-get /articles?include=author&fields[artiles]=title, body, author&fields[people]=name-
+- jsonapi.org
+big objects
 
-jsonpath
+- jsonpath
 $.store.book[?(@.length-1)].title
 
-jLinq
+- jLinq
 .omething().method().tralala()
 
-jq
+- jq
 '.foo .projects[]'
 
-RQL
+- RQL
 rating=5&price=lt=10 //lt opertor i.e. lt(price.10)
 /data?foo=3
 
-JSONiq
+- JSONiq
+Objects
 
-ObjectPath
-$..*[@..temp>25 and ...]
-
-hapijs: ljharb/qs
-foo[bar]=baz
+- hapijs: ljharb/qs (The qs module was originally created and maintained by TJ Holowaychuk.)
+foo[bar] -> {foo:{bar: val}}
 foo[bar][baz]=foobarbaz
 a[]=b&a[]=c
 
+- searchjs / jsql
+Objects
 
 
 
