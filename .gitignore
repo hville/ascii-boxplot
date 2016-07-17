@@ -1,9 +1,0 @@
-.git/
-.vscode/
-coverage/
-html-report/
-node_modules/
-bld/
-_old/
-info/
-*.log
