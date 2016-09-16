@@ -1,4 +1,4 @@
-var bp = require('../boxplot')
+var bp = require('./boxplot')
 var c = require('cotest')
 
 var N = 500,
