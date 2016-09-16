@@ -1,0 +1,27 @@
+{
+	"name": "ascii-boxplot",
+	"version": "1.0.0",
+	"description": "small configurable boxplot utility for the console",
+	"keywords": [
+		"boxplot", "box-plot", "console", "ascii", "chart"
+	],
+	"author": "Hugo Villeneuve",
+	"main": "./boxplot.js",
+	"dependencies": {
+		"sample-quantile": "^1.0.1"
+	},
+	"devDependencies": {
+		"cotest": "^1.0.0"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/hville/ascii-boxplot.git"
+	},
+	"scripts": {
+		"test": "node test"
+	},
+	"license": "MIT",
+	"publishConfig": {
+		"registry": "https://registry.npmjs.org/"
+	}
+}

@@ -1,0 +1,9 @@
+.git/
+.vscode/
+coverage/
+html-report/
+node_modules/
+bld/
+old/
+info/
+*.log
