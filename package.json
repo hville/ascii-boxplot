@@ -1,6 +1,6 @@
 {
 	"name": "ascii-boxplot",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"description": "small configurable boxplot utility for the console",
 	"keywords": [
 		"boxplot", "box-plot", "console", "ascii", "chart"
