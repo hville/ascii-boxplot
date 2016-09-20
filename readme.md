@@ -25,7 +25,7 @@ boxplot({
 
 `boxplot(sourceData[, options])`
 
-* `sourceData` object or array of samples. The keys are used as labels an array of sorted samples
+* `sourceData` object or array of samples. The object keys or array indices are used as labels
 * `options` optionsal configuration object
 
 ## Options
@@ -47,7 +47,7 @@ var defaults = {
 }
 ```
 
-* `1..9` are the templates for a given quantile size. The even chars are for the actual values, the odd ones are repeated in-between
+* `1..9` are the templates for a given quantile size. More info in the [template section](#templlate) below
 * `cols` the maximum width of the screen in characters
 * `padding` left and right padding (after the longest label and before the right edge)
 * `probs` the probabilities to be used when calculating the sample quantiles. Can be 1,2,3,5,7 or 9 chars long.
@@ -55,6 +55,28 @@ var defaults = {
 
 If the sample size is less or equal to `probs.length` the sample values are used as-is.
 This means that precomputed quantile values can also be used
+
+### Templates
+
+There are different templates for different number of probability points.
+For example, the default probability `[0, .02, .09, .25, .50, .75, .91, .98, 1]`
+has nine points and the display of the resulting values will use template #9.
+
+A template string has `2n+1` characters and has the form `svsvsv...`
+where alternating characters are used for actual values `v` and for spacing.
+
+Examples:
+
+```javascript
+boxplot(data, {
+  probs: [0.25, 0.5, 0.75],
+  3:`.L-M-H.`
+}) // --> something like '....L----M---H....'
+boxplot(data, {
+  probs: [0.09, 0.25, 0.5, 0.75, 0.],
+  3:` |-##|##-| `
+}) // --> something like ' |---###|####-----| '
+```
 
 ## License
 
