@@ -1,22 +1,32 @@
-var bp = require('./boxplot')
-var c = require('cotest')
+import bp from './boxplot.js'
+import t from 'assert-op'
 
 var N = 500,
 		source = ['patates', 'frites', 'poutines', 'choucroutte'].reduce(makeData, {})
 
-c('padding and columns', function() {
+t('wide and narrow', a => {
+	bp({fat:[0,1,2,3,4,5,6,7,8],bit:[1,1,1,1,1,1,1,1,1]}, {
+/* 		ondone: function(str) {
+			str.split(/\n/).forEach(function(line) {
+				console.log(line)
+				a('<=', line.trim().length, 80-20)
+			})
+		}
+ */	})
+})
+t('padding and columns', a => {
 	bp(source, {
 		padding: [10, 20],
 		cols: 80,
 		ondone: function(str) {
 			str.split(/\n/).forEach(function(line) {
 				console.log(line)
-				c('<=', line.trim().length, 80-20)
+				a('<=', line.trim().length, 80-20)
 			})
 		}
 	})
 })
-c('probs', function() {
+t('probs', a => {
 	bp(source, {
 		padding: [10, 10],
 		probs: [.25, .50, .75],
@@ -25,12 +35,12 @@ c('probs', function() {
 		ondone: function(str) {
 			str.split(/\n/).forEach(function(line) {
 				console.log(line)
-				c('==', line.trim().slice(-1), ']')
+				a('==', line.trim().slice(-1), ']')
 			})
 		}
 	})
 })
-c('custom dist - Array', function() {
+t('custom dist - Array', a => {
 	bp([[1,2,3],[4,5,6],[7,8,9]], {
 		padding: [5, 30],
 		3: ' A<B<C ',
@@ -38,7 +48,7 @@ c('custom dist - Array', function() {
 			var len = 0
 			str.split(/\n/).forEach(function(line) {
 				console.log(line)
-				c('>', line.trim().length, len)
+				a('>', line.trim().length, len)
 				len = line.trim().length
 			})
 		}

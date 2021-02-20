@@ -1,47 +1,39 @@
-var sampleQuantile = require('sample-quantile')
+import sampleQuantile from 'sample-quantile'
 
-module.exports = boxplot
-
-var defaults = {
+const defaults = {
 	1: ' • ',
 	2: ' [=] ',
 	3: ' [=|=] ',
-	5: ' [-[=|=]-] ',
-	7: ' • [-[=|=]-] • ',
-	9: ' · • [-[=|=]-] • · ',
-	cols: 0, // will attempt to autodetect if cols is falsy
+	5: ' [-[=|=]-- ',
+	7: ' • --[=|=]-- • ',
+	9: ' · • --[=|=]-- • · ',
+	cols: (typeof process !== 'undefined' && process?.stdout?.columns) || 80,
 	padding: [4, 4],
 	probs: [0, .02, .09, .25, .50, .75, .91, .98, 1],
 	ondone: function(str) { console.log(str) }
 }
 
-function boxplot(source, options) {
-	var cfg = options ? merge(defaults, options) : defaults,
+export default function(source, options={}) {
+	const cfg = Object.assign({}, defaults, options),
 			names = Object.keys(source),
 			data = getQuantiles(names, source, cfg),
-			cols = cfg.cols || (process && process.stdout && process.stdout.columns) || 80,
+			cols = cfg.cols,
 			ranges = getRange(names, data),
 			scale = (cols - cfg.padding[0] - cfg.padding[1] - 1 - ranges[0]) / (ranges[2] - ranges[1]),
 			offset = ranges[0] + cfg.padding[0] - ranges[1] * scale
 
-	for (var i=0; i< names.length; ++i) {
-		var str = names[i],
-				vals = data[names[i]],
+	for (let name of names) {
+		var vals = data[name],
 				chars = cfg[vals.length]
 		if (!chars) throw Error('invalid box plot dataset')
 
 		for (var j=0; j<vals.length; ++j) {
-			while (str.length < Math.round(vals[j] * scale + offset)) str += chars[2*j]
-			str += chars[2*j + 1]
+			while (name.length < Math.round(vals[j] * scale + offset)) name += chars[2*j]
+			name += chars[2*j + 1]
 		}
-		str += chars[2*j]
-		cfg.ondone(str)
+		name += chars[2*j]
+		cfg.ondone(name)
 	}
-}
-function merge(def, opt) {
-	var cfg = {}
-	for (var i=0, ks = Object.keys(def); i<ks.length; ++i) cfg[ks[i]] = opt[ks[i]] || def[ks[i]]
-	return cfg
 }
 function getQuantiles(names, source, cfg) {
 	var data = {}
